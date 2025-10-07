@@ -33,7 +33,7 @@ public class Zone {
     private final ConcurrentHashMap<Player, Integer> zonePlayers = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Player, BossBar> bossbars = new ConcurrentHashMap<>();
     private final LinkedList<Reward> rewards = new LinkedList<>();
-    private final Cooldown<Player> cooldown = new Cooldown<>();
+    private final Cooldown<Player> cooldown = Cooldown.createSynchronized();
     private final MessageUtils msg;
     private final String name;
     private final Config settings;

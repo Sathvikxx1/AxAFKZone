@@ -1,5 +1,6 @@
 package com.artillexstudios.axafkzone;
 
+import com.artillexstudios.axafkzone.commands.CommandManager;
 import com.artillexstudios.axafkzone.commands.Commands;
 import com.artillexstudios.axafkzone.listeners.WandListeners;
 import com.artillexstudios.axafkzone.listeners.WorldListeners;
@@ -43,8 +44,7 @@ public final class AxAFKZone extends AxPlugin {
     public void enable() {
         instance = this;
 
-        int pluginId = 22054;
-        new Metrics(this, pluginId);
+        new Metrics(this, 22054);
 
         CONFIG = new Config(new File(getDataFolder(), "config.yml"), getResource("config.yml"), GeneralSettings.builder().setUseDefaults(false).build(), LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setKeepAll(true).setVersioning(new BasicVersioning("version")).build());
         LANG = new Config(new File(getDataFolder(), "lang.yml"), getResource("lang.yml"), GeneralSettings.builder().setUseDefaults(false).build(), LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("version")).build());
@@ -56,7 +56,7 @@ public final class AxAFKZone extends AxPlugin {
 
         threadedQueue = new ThreadedQueue<>("AxAFKZone-Datastore-thread");
 
-        Commands.registerCommand();
+        CommandManager.load();
         FileUtils.loadAll();
 
         getServer().getPluginManager().registerEvents(new WandListeners(), this);

@@ -27,7 +27,7 @@ public class Reward {
         if (map != null) {
             final LinkedList<Map<Object, Object>> map2 = new LinkedList<>(map);
             for (Map<Object, Object> it : map2) {
-                items.add(new ItemBuilder(it).get());
+                items.add(ItemBuilder.create(it).get());
             }
         }
 
