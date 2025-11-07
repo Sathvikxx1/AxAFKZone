@@ -14,16 +14,15 @@ public class TickZones {
     public static void start() {
         if (service != null) service.shutdown();
 
-        service = Executors.newSingleThreadScheduledExecutor();
+        service = Executors.newSingleThreadScheduledExecutor(
+                r -> new Thread(r, "AxAFKZone-Ticking-Thread (x1)"));
+
         service.scheduleAtFixedRate(() -> {
             try {
                 for (Zone zone : Zones.getZones().values()) {
                     zone.tick();
                 }
-
-                WandListeners.getSelections().forEach((player, selection) -> {
-                    selection.show(player);
-                });
+                WandListeners.getSelections().forEach((player, selection) -> selection.show(player));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
