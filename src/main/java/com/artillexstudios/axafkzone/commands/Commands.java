@@ -20,7 +20,7 @@ import revxrsal.commands.orphan.OrphanCommand;
 @CommandPermission(value = "axafkzone.admin", defaultAccess = PermissionDefault.OP)
 public class Commands implements OrphanCommand {
 
-    @DefaultFor({"~", "help"})
+    @Subcommand("help")
     public void help(@NotNull CommandSender sender) {
         Help.INSTANCE.execute(sender);
     }
