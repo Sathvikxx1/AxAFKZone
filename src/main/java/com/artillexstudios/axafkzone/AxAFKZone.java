@@ -1,7 +1,6 @@
 package com.artillexstudios.axafkzone;
 
 import com.artillexstudios.axafkzone.commands.CommandManager;
-import com.artillexstudios.axafkzone.commands.Commands;
 import com.artillexstudios.axafkzone.listeners.WandListeners;
 import com.artillexstudios.axafkzone.listeners.WorldListeners;
 import com.artillexstudios.axafkzone.schedulers.TickZones;

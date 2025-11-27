@@ -6,6 +6,8 @@ import com.artillexstudios.axafkzone.utils.RandomUtils;
 import com.artillexstudios.axafkzone.utils.TimeUtils;
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.libs.boostedyaml.block.implementation.Section;
+import com.artillexstudios.axapi.nms.wrapper.ServerPlayerWrapper;
+import com.artillexstudios.axapi.packet.wrapper.clientbound.ClientboundClearTitlesWrapper;
 import com.artillexstudios.axapi.serializers.Serializers;
 import com.artillexstudios.axapi.utils.ActionBar;
 import com.artillexstudios.axapi.utils.BossBar;
@@ -76,7 +78,6 @@ public class Zone {
                     if (CONFIG.getBoolean("reset-after-reward", false)) zonePlayers.put(player, 0);
                 }
 
-                // Only send visual updates once per second, not per tick
                 sendTitle(player);
                 sendActionbar(player);
                 updateBossbar(player);
@@ -116,14 +117,18 @@ public class Zone {
             bossBar.show(player);
             bossbars.put(player, bossBar);
         }
+        sendTitle(player);
+        sendActionbar(player);
     }
 
     private void leave(Player player, Iterator<Map.Entry<Player, Integer>> it) {
-        if (player.isOnline())
+        if (player.isOnline()) {
             msg.sendLang(player, "messages.left", Map.of("%time%", TimeUtils.fancyTime(zonePlayers.get(player) * 1_000L)));
+        }
         it.remove();
         BossBar bossBar = bossbars.remove(player);
         if (bossBar != null) bossBar.remove();
+        removeTitle(player);
     }
 
     private void sendTitle(Player player) {
@@ -133,10 +138,15 @@ public class Zone {
             Title title = Title.create(
                     zoneTitle == null ? Component.empty() : StringUtils.format(zoneTitle.replace("%time%", TimeUtils.fancyTime(timeUntilNext(player)))),
                     zoneSubTitle == null ? Component.empty() : StringUtils.format(zoneSubTitle.replace("%time%", TimeUtils.fancyTime(timeUntilNext(player)))),
-                    0, 10, 0
+                    0, 25, 0
             );
             title.send(player);
         }
+    }
+
+    private void removeTitle(Player player) {
+        ServerPlayerWrapper wrapper = ServerPlayerWrapper.wrap(player);
+        wrapper.sendPacket(new ClientboundClearTitlesWrapper(true));
     }
 
     private void sendActionbar(Player player) {
