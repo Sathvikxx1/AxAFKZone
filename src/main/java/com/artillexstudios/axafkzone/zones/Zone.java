@@ -75,12 +75,13 @@ public class Zone {
                     giveRewards(player, newTime);
                     if (CONFIG.getBoolean("reset-after-reward", false)) zonePlayers.put(player, 0);
                 }
+
+                // Only send visual updates once per second, not per tick
+                sendTitle(player);
+                sendActionbar(player);
+                updateBossbar(player);
             }
             players.remove(player);
-
-            sendTitle(player);
-            sendActionbar(player);
-            updateBossbar(player);
         }
 
         int ipLimit = CONFIG.getInt("zone-per-ip-limit", -1);
