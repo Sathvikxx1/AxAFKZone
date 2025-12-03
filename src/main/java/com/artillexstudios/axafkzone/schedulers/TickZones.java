@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class TickZones {
     private static ScheduledExecutorService service = null;
 
-    public static void start() {
+    public static void tick() {
         if (service != null) service.shutdown();
 
         service = Executors.newSingleThreadScheduledExecutor(

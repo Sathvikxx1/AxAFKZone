@@ -29,24 +29,31 @@ public class Region {
 
     public Set<Player> getPlayersInZone() {
         if (world == null) return Set.of();
-        final HashSet<Player> players = new HashSet<>();
+        final Set<Player> players = new HashSet<>();
 
-        String permission = zone.getSettings().getString("permission");
+        final String permission = zone.getSettings().getString("permission");
+        final boolean needsPerm = permission != null && !permission.isBlank();
+
+        final int x1 = Math.min(corner1.getBlockX(), corner2.getBlockX());
+        final int y1 = Math.min(corner1.getBlockY(), corner2.getBlockY());
+        final int z1 = Math.min(corner1.getBlockZ(), corner2.getBlockZ());
+        final int x2 = Math.max(corner1.getBlockX(), corner2.getBlockX());
+        final int y2 = Math.max(corner1.getBlockY(), corner2.getBlockY());
+        final int z2 = Math.max(corner1.getBlockZ(), corner2.getBlockZ());
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.isDead()) continue;
-            if (!permission.isBlank() && !player.hasPermission(permission)) continue;
             if (!player.getWorld().equals(world)) continue;
+            if (needsPerm && !player.hasPermission(permission)) continue;
 
             final Location loc = player.getLocation();
+            final int x = loc.getBlockX();
+            final int y = loc.getBlockY();
+            final int z = loc.getBlockZ();
 
-            int x1 = Math.min(corner1.getBlockX(), corner2.getBlockX());
-            int y1 = Math.min(corner1.getBlockY(), corner2.getBlockY());
-            int z1 = Math.min(corner1.getBlockZ(), corner2.getBlockZ());
-            int x2 = Math.max(corner1.getBlockX(), corner2.getBlockX());
-            int y2 = Math.max(corner1.getBlockY(), corner2.getBlockY());
-            int z2 = Math.max(corner1.getBlockZ(), corner2.getBlockZ());
-
-            if (!(loc.getBlockX() >= x1 && loc.getBlockX() <= x2 && loc.getBlockY() >= y1 && loc.getBlockY() <= y2 && loc.getBlockZ() >= z1 && loc.getBlockZ() <= z2)) continue;
+            if (x < x1 || x > x2) continue;
+            if (y < y1 || y > y2) continue;
+            if (z < z1 || z > z2) continue;
 
             players.add(player);
         }

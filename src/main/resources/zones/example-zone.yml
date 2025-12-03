@@ -13,7 +13,8 @@ messages:
 in-zone:
   title: "&#CC0055⌚ &7| &#FF8855ʏᴏᴜ ᴀʀᴇ ᴀғᴋ &7| &#CC0055⌚"
   subtitle: "&#FFBB00Next reward in: &#CC0055%time%"
-  actionbar: ""
+  actionbar: "&#FFBB00Next reward in: &#CC0055%time%"
+
   # remove the section to disable
   bossbar:
     name: "&#CC0055⌚ &7| &#FF8855ʏᴏᴜ ᴀʀᴇ ᴀғᴋ &7| &#FFBB00Next reward in: &#CC0055%time%"
