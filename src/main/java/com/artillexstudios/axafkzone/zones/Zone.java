@@ -6,14 +6,26 @@ import com.artillexstudios.axafkzone.utils.RandomUtils;
 import com.artillexstudios.axafkzone.utils.TimeUtils;
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.libs.boostedyaml.block.implementation.Section;
+import com.artillexstudios.axapi.nms.wrapper.ServerPlayerWrapper;
+import com.artillexstudios.axapi.packet.wrapper.clientbound.ClientboundClearTitlesWrapper;
 import com.artillexstudios.axapi.serializers.Serializers;
+import com.artillexstudios.axapi.utils.ActionBar;
 import com.artillexstudios.axapi.utils.BossBar;
 import com.artillexstudios.axapi.utils.Cooldown;
 import com.artillexstudios.axapi.utils.MessageUtils;
 import com.artillexstudios.axapi.utils.StringUtils;
+import com.artillexstudios.axapi.utils.Title;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.artillexstudios.axafkzone.AxAFKZone.CONFIG;
@@ -65,12 +77,12 @@ public class Zone {
                     giveRewards(player, newTime);
                     if (CONFIG.getBoolean("reset-after-reward", false)) zonePlayers.put(player, 0);
                 }
+
+                sendTitle(player);
+                sendActionbar(player);
+                updateBossbar(player);
             }
             players.remove(player);
-
-            sendTitle(player);
-            sendActionbar(player);
-            updateBossbar(player);
         }
 
         int ipLimit = CONFIG.getInt("zone-per-ip-limit", -1);
@@ -105,41 +117,42 @@ public class Zone {
             bossBar.show(player);
             bossbars.put(player, bossBar);
         }
+        sendTitle(player);
+        sendActionbar(player);
     }
 
     private void leave(Player player, Iterator<Map.Entry<Player, Integer>> it) {
-        if (player.isOnline())
+        if (player.isOnline()) {
             msg.sendLang(player, "messages.left", Map.of("%time%", TimeUtils.fancyTime(zonePlayers.get(player) * 1_000L)));
+        }
         it.remove();
         BossBar bossBar = bossbars.remove(player);
         if (bossBar != null) bossBar.remove();
+        removeTitle(player);
     }
 
-
     private void sendTitle(Player player) {
-        final String title = settings.getString("in-zone.title", "");
-        final String subtitle = settings.getString("in-zone.subtitle", "");
-
-        if (!title.isBlank() || !subtitle.isBlank()) {
-            final String time = TimeUtils.fancyTime(timeUntilNext(player));
-
-            player.sendTitle(
-                    StringUtils.formatToString(title.replace("%time%", time)),
-                    StringUtils.formatToString(subtitle.replace("%time%", time)),
-                    0,
-                    10,
-                    0
+        String zoneTitle = settings.getString("in-zone.title", null);
+        String zoneSubTitle = settings.getString("in-zone.subtitle", null);
+        if (zoneTitle != null && !zoneTitle.isBlank() || zoneSubTitle != null && !zoneSubTitle.isBlank()) {
+            Title title = Title.create(
+                    zoneTitle == null ? Component.empty() : StringUtils.format(zoneTitle.replace("%time%", TimeUtils.fancyTime(timeUntilNext(player)))),
+                    zoneSubTitle == null ? Component.empty() : StringUtils.format(zoneSubTitle.replace("%time%", TimeUtils.fancyTime(timeUntilNext(player)))),
+                    0, 25, 0
             );
+            title.send(player);
         }
     }
 
+    private void removeTitle(Player player) {
+        ServerPlayerWrapper wrapper = ServerPlayerWrapper.wrap(player);
+        wrapper.sendPacket(new ClientboundClearTitlesWrapper(true));
+    }
+
     private void sendActionbar(Player player) {
-        final String actionbarText = settings.getString("in-zone.actionbar", "");
-
-        if (!actionbarText.isBlank()) {
-            final String time = TimeUtils.fancyTime(timeUntilNext(player));
-
-            player.sendActionBar(StringUtils.format(actionbarText.replace("%time%", time)));
+        String zoneActionbar = settings.getString("in-zone.actionbar", null);
+        if (zoneActionbar != null && !zoneActionbar.isBlank()) {
+            ActionBar.send(player, StringUtils.format(zoneActionbar.replace("%time%", TimeUtils.fancyTime(timeUntilNext(player)))));
         }
     }
 
